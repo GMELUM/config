@@ -3,12 +3,10 @@ packages:
   -curl
 
 runcmd:
-  -
   - export KEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPGT2AHuhMZoVmJ0AxqLnG6/sAnzfGNRzDyc5Z8GvXUe master"
   - export EMAIL="gmelum@vk.com"
   - export DOMAIN="elum.su"
   - export SUBDOMAIN="shop.anonim"
-  -
   - curl -O "https://sh.elum.su/init.sh"
   - chmod +x init.sh
   - sh ./init.sh $KEY $EMAIL $DOMAIN $SUBDOMAIN
