@@ -84,9 +84,7 @@ echo "Installing Nginx..."
 apt install nginx -y
 
 echo "Installing Certbot..."
-add-apt-repository ppa:certbot/certbot -y
-apt-get update
-apt install python-certbot-nginx -y
+apt -y install certbot
 
 echo "Installing Git..."
 apt install git-all -y
