@@ -120,6 +120,30 @@ echo "}" >>/etc/nginx/domains/$DOMAIN.conf
 echo "Start Nginx..."
 systemctl start nginx
 
+echo "Install Dig..."
+apt install dnsutils -y
+
+echo "Chekout DNS"
+while true; do
+    result=$(dig +short shop.anonim.elum.su)
+    current_ip=$(hostname -I)
+
+    match=0
+    for ip in $result; do
+        if [ $ip = $current_ip ]; then
+            match=1
+            break
+        fi
+    done
+
+    if [ $match = 1 ]; then
+        break
+    fi
+
+    echo "The corresponding DNS record could not be found. Checked again in 10 seconds..."
+    sleep 10
+done
+
 echo "Creating ssl certificate with Certbot..."
 certbot --nginx -n -d $SUBDOMAIN"."$DOMAIN --agree-tos -m $EMAIL --redirect
 
