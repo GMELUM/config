@@ -120,9 +120,6 @@ echo "}" >>/etc/nginx/domains/$DOMAIN.conf
 echo "Start Nginx..."
 systemctl start nginx
 
-echo "Install Dig..."
-apt install dnsutils -y
-
 echo "Chekout DNS"
 while true; do
     result=$(dig +short $SUBDOMAIN"."$DOMAIN)
@@ -145,7 +142,7 @@ while true; do
 done
 
 echo "Creating ssl certificate with Certbot..."
-certbot --nginx -n -d $SUBDOMAIN"."$DOMAIN --agree-tos -m $EMAIL --redirect
+certbot --nginx -n -d $SUBDOMAIN"."$DOMAIN
 
 echo "Restart Nginx..."
 systemctl restart nginx
