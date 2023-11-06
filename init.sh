@@ -96,9 +96,6 @@ ip6tables-save >/etc/iptables/rules.v6
 echo "Installing Curl..."
 apt install curl -y
 
-echo "Install Snapd..."
-apt install snapd -y
-
 echo "Installing Nginx..."
 apt install nginx -y
 
