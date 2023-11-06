@@ -125,7 +125,7 @@ apt install dnsutils -y
 
 echo "Chekout DNS"
 while true; do
-    result=$(dig +short shop.anonim.elum.su)
+    result=$(dig +short $SUBDOMAIN"."$DOMAIN)
     current_ip=$(hostname -I)
 
     match=0
