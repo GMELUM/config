@@ -126,7 +126,7 @@ apt install dnsutils -y
 echo "Chekout DNS"
 while true; do
     result=$(dig +short $SUBDOMAIN"."$DOMAIN)
-    current_ip=$(hostname -I)
+    current_ip=$(wget -O - -q icanhazip.com)
 
     match=0
     for ip in $result; do
