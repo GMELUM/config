@@ -11,7 +11,7 @@ SUBDOMAIN="$4"
 IP_PEER_SECONDS="100"
 PEER_SECONDS="20000r/s"
 BURST_PEER_SECONDS="40000"
-
+PROXY="http://localhost:18300/"
 GOLANG_VERSION="1.21.3"
 
 echo "Updating packages..."
@@ -113,8 +113,7 @@ echo "server {" >>/etc/nginx/domains/$DOMAIN.conf
 echo "  listen 80;" >>/etc/nginx/domains/$DOMAIN.conf
 echo "  server_name $SUBDOMAIN"."$DOMAIN;" >>/etc/nginx/domains/$DOMAIN.conf
 echo "  location / {" >>/etc/nginx/domains/$DOMAIN.conf
-echo "    default_type text/html;" >>/etc/nginx/domains/$DOMAIN.conf
-echo "     return 200;" >>/etc/nginx/domains/$DOMAIN.conf
+echo "    proxy_pass $PROXY;" >>/etc/nginx/domains/$DOMAIN.conf
 echo " }" >>/etc/nginx/domains/$DOMAIN.conf
 echo "}" >>/etc/nginx/domains/$DOMAIN.conf
 
