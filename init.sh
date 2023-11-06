@@ -107,15 +107,6 @@ apt install python-certbot-nginx -y
 echo "Installing Git..."
 apt install git-all -y
 
-echo "Installing Golang..."
-curl -O https://dl.google.com/go/go$GOLANG_VERSION.linux-amd64.tar.gz
-tar xvf go$GOLANG_VERSION.linux-amd64.tar.gz
-chown -R root:root ./go
-mv go /usr/local
-echo "export GOPATH=$HOME/work" >>~/.profile
-echo "export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin" >>~/.profile
-source ~/.profile
-
 echo "Cloning Nginx configuration files..."
 rm -rf /etc/nginx
 git clone https://github.com/GMELUM/vps.nginx.conf /etc/nginx
