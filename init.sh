@@ -49,25 +49,44 @@ sysctl -w net.core.netdev_max_backlog=20000
 sysctl -w net.core.somaxconn=20000
 
 echo "Configuring iptables v4..."
+iptables -F
+iptables -X
+
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+
 iptables -N syn_flood
-iptables -A INPUT -p tcp --syn -j syn_flood
-iptables -A syn_flood -m limit --limit 500/s --limit-burst 2000 -j RETURN
-iptables -A syn_flood -j DROP
-iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP
-iptables -A INPUT -p tcp --tcp-flags SYN,FIN SYN,FIN -j DROP
-iptables -A INPUT -p tcp --tcp-flags SYN,RST SYN,RST -j DROP
-iptables -A INPUT -p tcp --tcp-flags FIN,RST FIN,RST -j DROP
-iptables -A INPUT -p tcp --tcp-flags ACK,FIN FIN -j DROP
-iptables -A INPUT -p tcp --iptables-flags ACK,PSH PSH -j DROP
-iptables -A INPUT -p tcp --tcp-flags ACK,URG URG -j DROP
-iptables -A INPUT -p tcp --dport 21 -j ACCEPT
-iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+iptables -N port-scanning
+
+iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
+iptables -A INPUT -p tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m conntrack --ctstate NEW -j DROP
+iptables -A INPUT -p tcp -m conntrack --ctstate NEW -m tcpmss ! --mss 536:65535 -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,PSH,ACK,URG NONE -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags FIN,SYN FIN,SYN -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags SYN,RST SYN,RST -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags FIN,SYN FIN,SYN -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags FIN,RST FIN,RST -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags FIN,ACK FIN -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags ACK,URG URG -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags FIN,ACK FIN -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags PSH,ACK PSH -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,PSH,ACK,URG FIN,SYN,RST,PSH,ACK,URG -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,PSH,ACK,URG NONE -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,PSH,ACK,URG FIN,PSH,URG -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,PSH,ACK,URG FIN,SYN,PSH,URG -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,PSH,ACK,URG FIN,SYN,RST,ACK,URG -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -m multiport --dports 80,443 -m connlimit --connlimit-above 30 --connlimit-mask 32 --connlimit-saddr -j DROP
+iptables -A INPUT -p tcp -m multiport --dports 80,443,21,22 -j ACCEPT
+
+iptables -A port-scanning -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK RST -m limit --limit 1/sec --limit-burst 2 -j RETURN
+iptables -A port-scanning -j DROP
+
 iptables -A INPUT -p tcp --dport 80 -j ACCEPT
 iptables -A INPUT -p tcp --dport 443 -j ACCEPT
-iptables -A INPUT -p icmp -j DROP
-iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -p tcp --dport 21 -j ACCEPT
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
 iptables -A INPUT -j DROP
-iptables-save >/etc/iptables/rules.v4
 
 echo "Configuring iptables v6..."
 ip6tables -A INPUT -j DROP
