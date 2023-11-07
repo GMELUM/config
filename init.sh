@@ -157,7 +157,7 @@ while true; do
 done
 
 echo "Creating ssl certificate with Certbot..."
-certbot --nginx -n -d $SUBDOMAIN"."$DOMAIN
+certbot --nginx -n -d $SUBDOMAIN"."$DOMAIN --agree-tos --email $EMAIL
 
 echo "Restart Nginx..."
 systemctl restart nginx
