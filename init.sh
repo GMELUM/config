@@ -102,11 +102,6 @@ iptables -A INPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -m multiport --d
 iptables -A port-scanning -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK RST -m limit --limit 1/sec --limit-burst 2 -j RETURN
 iptables -A port-scanning -j DROP
 
-iptables -A INPUT -m multiport -p tcp --dport 80,443,21,22,53,9418,123 -j ACCEPT
-iptables -A INPUT -m multiport -p udp --dport 53,9418,123 -j ACCEPT
-iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-iptables -A INPUT -j DROP
-
 iptables-save >/etc/iptables/rules.v4
 
 echo "Configuring iptables v6..."
