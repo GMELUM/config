@@ -38,6 +38,9 @@ sed -i 's/#? *ChallengeResponseAuthentication .*/ChallengeResponseAuthentication
 sed -i 's/#? *UsePAM .*/UsePAM no/' /etc/ssh/sshd_config
 sed -i 's/#? *PrintLastLog .*/PrintLastLog no/' /etc/ssh/sshd_config
 
+echo "Install Dig"
+apt install dnsutils -y
+
 echo "Installing Curl..."
 apt install curl -y
 
