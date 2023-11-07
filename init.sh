@@ -38,6 +38,24 @@ sed -i 's/#? *ChallengeResponseAuthentication .*/ChallengeResponseAuthentication
 sed -i 's/#? *UsePAM .*/UsePAM no/' /etc/ssh/sshd_config
 sed -i 's/#? *PrintLastLog .*/PrintLastLog no/' /etc/ssh/sshd_config
 
+echo "Installing Curl..."
+apt install curl -y
+
+echo "Installing Nginx..."
+apt install nginx -y
+
+echo "Installing Certbot..."
+add-apt-repository ppa:certbot/certbot -y
+apt-get update
+apt install python-certbot-nginx -y
+
+echo "Installing Git..."
+apt install git-all -y
+
+echo "Install iptables..."
+apt install iptables -y
+mkdir -p /etc/iptables/
+
 echo "Configuring network..."
 sysctl -w net.ipv4.tcp_syncookies=1
 sysctl -w net.ipv4.tcp_max_syn_backlog=40000
@@ -88,24 +106,13 @@ iptables -A INPUT -p tcp --dport 21 -j ACCEPT
 iptables -A INPUT -p tcp --dport 22 -j ACCEPT
 iptables -A INPUT -j DROP
 
+iptables-save >/etc/iptables/rules.v4
+
 echo "Configuring iptables v6..."
 ip6tables -A INPUT -j DROP
 ip6tables -A FORWARD -j DROP
+
 ip6tables-save >/etc/iptables/rules.v6
-
-echo "Installing Curl..."
-apt install curl -y
-
-echo "Installing Nginx..."
-apt install nginx -y
-
-echo "Installing Certbot..."
-add-apt-repository ppa:certbot/certbot -y
-apt-get update
-apt install python-certbot-nginx -y
-
-echo "Installing Git..."
-apt install git-all -y
 
 echo "Cloning Nginx configuration files..."
 rm -rf /etc/nginx
