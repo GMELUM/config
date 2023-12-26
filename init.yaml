@@ -14,5 +14,5 @@ runcmd:
 apt install curl -y
 curl -O sh.elum.su/init.sh
 chmod +x init.sh
-sh init.sh "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPGT2AHuhMZoVmJ0AxqLnG6/sAnzfGNRzDyc5Z8GvXUe master" "gmelum@vk.com" "elum.su" "shop.anonim"
+sh init.sh "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPGT2AHuhMZoVmJ0AxqLnG6/sAnzfGNRzDyc5Z8GvXUe master" "gmelum@vk.com" "elum.su" "auth"
 # sh init.sh "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPGT2AHuhMZoVmJ0AxqLnG6/sAnzfGNRzDyc5Z8GvXUe master" "gmelum@vk.com" "elum.su" "shop.anonim"

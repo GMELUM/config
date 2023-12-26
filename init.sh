@@ -38,6 +38,9 @@ sed -i 's/#? *ChallengeResponseAuthentication .*/ChallengeResponseAuthentication
 sed -i 's/#? *UsePAM .*/UsePAM no/' /etc/ssh/sshd_config
 sed -i 's/#? *PrintLastLog .*/PrintLastLog no/' /etc/ssh/sshd_config
 
+echo "Install IPTables"
+apt install iptables -y
+
 echo "Install Dig"
 apt install dnsutils -y
 
@@ -50,7 +53,7 @@ apt install nginx -y
 echo "Installing Certbot..."
 add-apt-repository ppa:certbot/certbot -y
 apt-get update
-apt install python-certbot-nginx -y
+apt install certbot python3-certbot-nginx -y
 
 echo "Installing Git..."
 apt install git-all -y
