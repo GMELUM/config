@@ -19,14 +19,14 @@ apt update
 apt upgrade -y
 
 echo "Remove Print log..."
-echo "" > /etc/motd
+echo "" >/etc/motd
 
 echo "Created user..."
 useradd -m -d $USER_HOMEDIR -s $USER_SHELL -p "" $USER_NAME
 
 echo "Configure user..."
 mkdir -p $USER_HOMEDIR/.ssh
-echo $USER_SSH_KEY >> $USER_HOMEDIR/.ssh/authorized_keys
+echo $USER_SSH_KEY >>$USER_HOMEDIR/.ssh/authorized_keys
 chmod 700 $USER_HOMEDIR/.ssh
 chmod 600 $USER_HOMEDIR/.ssh/authorized_keys
 chown -R $USER_NAME:$USER_NAME $USER_HOMEDIR/.ssh
@@ -63,6 +63,7 @@ apt install iptables -y
 mkdir -p /etc/iptables/
 
 echo "Configuring network..."
+sysctl -w net.ipv4.icmp_echo_ignore_all = 1
 sysctl -w net.ipv4.tcp_syncookies=1
 sysctl -w net.ipv4.tcp_max_syn_backlog=40000
 sysctl -w net.ipv4.tcp_synack_retries=1
@@ -118,17 +119,19 @@ rm -rf /etc/nginx
 git clone https://github.com/GMELUM/vps.nginx.conf /etc/nginx
 
 echo "Creating Nginx configuration file..."
-echo "limit_conn_zone \$binary_remote_addr zone=addr:10m;" >/etc/nginx/domains/$DOMAIN.conf
-echo "limit_conn addr $IP_PEER_SECONDS;" >>/etc/nginx/domains/$DOMAIN.conf
-echo "limit_req_zone \$binary_remote_addr zone=req_limit:10m rate=$PEER_SECONDS;" >>/etc/nginx/domains/$DOMAIN.conf
-echo "limit_req zone=req_limit burst=$BURST_PEER_SECONDS;" >>/etc/nginx/domains/$DOMAIN.conf
-echo "server {" >>/etc/nginx/domains/$DOMAIN.conf
-echo "  listen 80;" >>/etc/nginx/domains/$DOMAIN.conf
-echo "  server_name $SUBDOMAIN"."$DOMAIN;" >>/etc/nginx/domains/$DOMAIN.conf
-echo "  location / {" >>/etc/nginx/domains/$DOMAIN.conf
-echo "    proxy_pass $PROXY;" >>/etc/nginx/domains/$DOMAIN.conf
-echo " }" >>/etc/nginx/domains/$DOMAIN.conf
-echo "}" >>/etc/nginx/domains/$DOMAIN.conf
+{
+    echo "limit_conn_zone \$binary_remote_addr zone=addr:10m;"
+    echo "limit_conn addr $IP_PEER_SECONDS;"
+    echo "limit_req_zone \$binary_remote_addr zone=req_limit:10m rate=$PEER_SECONDS;"
+    echo "limit_req zone=req_limit burst=$BURST_PEER_SECONDS;"
+    echo "server {"
+    echo "  listen 80;"
+    echo "  server_name $SUBDOMAIN.$DOMAIN;"
+    echo "  location / {"
+    echo "    proxy_pass $PROXY;"
+    echo "  }"
+    echo "}"
+} >/etc/nginx/domains/$DOMAIN.conf
 
 echo "Start Nginx..."
 systemctl start nginx
@@ -155,7 +158,52 @@ while true; do
 done
 
 echo "Creating ssl certificate with Certbot..."
-certbot --nginx -n -d $SUBDOMAIN"."$DOMAIN --agree-tos --email $EMAIL
+certbot --nginx --certonly -n -d $SUBDOMAIN"."$DOMAIN --agree-tos --email $EMAIL
+
+echo "Update Nginx configuration file..."
+{
+    echo "limit_conn_zone \$binary_remote_addr zone=conn_user:10m;"
+    echo "limit_conn_zone \$server_name zone=conn_global:10m;"
+    echo ""
+    echo "limit_req_zone \$binary_remote_addr zone=req_user:10m rate=50r/s;"
+    echo "limit_req_zone \$server_name zone=req_global:10m rate=20000r/s;"
+    echo ""
+    echo "upstream app {"
+    echo "  server 127.0.0.1:18300;"
+    echo "}"
+    echo ""
+    echo "server {"
+    echo "  listen 80;"
+    echo "  server_name $DOMAIN;"
+    echo ""
+    echo "  if ($host = $DOMAIN) {"
+    echo "    return 301 https://$host$request_uri;"
+    echo "  }"
+    echo ""
+    echo "  return 404"
+    echo "}"
+    echo ""
+    echo "server {"
+    echo "  listen 443 ssl;"
+    echo "  server_name $DOMAIN;"
+    echo ""
+    echo "  ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;"
+    echo "  ssl_certificate_key /etc/letsencrypt/live/$DOMAIN/privkey.pem;"
+    echo "  include /etc/letsencrypt/options-ssl-nginx.conf;"
+    echo "  ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;"
+    echo ""
+    echo "  limit_conn conn_user 10;"
+    echo "  limit_conn conn_global 20000;"
+    echo ""
+    echo "  limit_req zone=req_user burst=100;"
+    echo "  limit_req zone=req_global burst=40000;"
+    echo ""
+    echo "  location / {"
+    echo "    proxy_pass http://app;"
+    echo "  }"
+    echo ""
+    echo "}"
+} >/etc/nginx/domains/$DOMAIN.conf
 
 echo "Restart Nginx..."
 systemctl restart nginx
