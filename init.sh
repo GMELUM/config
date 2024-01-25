@@ -7,7 +7,6 @@ USER_SSH_KEY="$1"
 
 EMAIL="$2"
 DOMAIN="$3"
-SUBDOMAIN="$4"
 IP_PEER_SECONDS="100"
 PEER_SECONDS="20000r/s"
 BURST_PEER_SECONDS="40000"
@@ -126,7 +125,7 @@ echo "Creating Nginx configuration file..."
     echo "limit_req zone=req_limit burst=$BURST_PEER_SECONDS;"
     echo "server {"
     echo "  listen 80;"
-    echo "  server_name $SUBDOMAIN.$DOMAIN;"
+    echo "  server_name $DOMAIN;"
     echo "  location / {"
     echo "    proxy_pass $PROXY;"
     echo "  }"
@@ -138,7 +137,7 @@ systemctl start nginx
 
 echo "Chekout DNS"
 while true; do
-    result=$(dig +short $SUBDOMAIN"."$DOMAIN)
+    result=$(dig +short $DOMAIN)
     current_ip=$(wget -O - -q icanhazip.com)
 
     match=0
@@ -158,7 +157,7 @@ while true; do
 done
 
 echo "Creating ssl certificate with Certbot..."
-certbot --nginx --certonly -n -d $SUBDOMAIN"."$DOMAIN --agree-tos --email $EMAIL
+certbot --nginx --certonly -n -d $DOMAIN --agree-tos --email $EMAIL
 
 echo "Update Nginx configuration file..."
 {
