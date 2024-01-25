@@ -157,7 +157,7 @@ while true; do
 done
 
 echo "Creating ssl certificate with Certbot..."
-certbot --nginx --certonly -n -d $DOMAIN --agree-tos --email $EMAIL
+certbot certonly --nginx  -n -d $DOMAIN --agree-tos --email $EMAIL
 
 echo "Update Nginx configuration file..."
 {
