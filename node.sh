@@ -4,7 +4,6 @@ USER_NAME="server"
 USER_HOMEDIR="/home/server"
 USER_SHELL="/bin/bash"
 USER_SSH_KEY="$1"
-USER_SSH_PORT="$2"
 
 echo "Running the node setup script..."
 
@@ -28,6 +27,5 @@ sed -i 's/#? *PasswordAuthentication .*/PasswordAuthentication no/' /etc/ssh/ssh
 sed -i 's/#? *ChallengeResponseAuthentication .*/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
 sed -i 's/#? *UsePAM .*/UsePAM no/' /etc/ssh/sshd_config
 sed -i 's/#? *PrintLastLog .*/PrintLastLog no/' /etc/ssh/sshd_config
-sed -i 's/#? *Port 22/Port $USER_SSH_PORT/' /etc/ssh/sshd_config
 
 systemctl restart sshd
