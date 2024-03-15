@@ -45,6 +45,6 @@ echo "Add blacklist lua script"
     echo "  ngx.log(ngx.DEBUG, \"Banned IP detected and refused access: \" .. ip);"
     echo "  ngx.status = 200;"
     echo "  ngx.header.content_type = \"application/json; charset=utf-8\";"
-    echo "  return ngx.print(\"{\"error\":{\"code\":0,\"message\":\\\"Forbidden\\\"}}\");"
+    echo "  return ngx.print(\"{\\\"error\\\":{\\\"code\\\":0,\\\"message\\\":\\\"Forbidden\\\"}}\");"
     echo "end"
 } > /etc/nginx/lua/ip-blacklist.lua
