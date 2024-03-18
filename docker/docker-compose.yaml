@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: [password]
+      MYSQL_DATABASE: [database]
+      MYSQL_USER: [user]
+      MYSQL_PASSWORD: [password]
+    ports:
+      - "3306:3306"
+    volumes:
+      - /root/mysql:/var/lib/mysql
+    command:
+      - "--max_connections=500"
+      - "--bind-address=0.0.0.0"
+
+  mysql_backup:
+    image: mysql:latest
+    restart: daily
+    volumes:
+      - /root/backups:/backups
+    command: sh -c 'sleep 3600 && mysqldump -h mysql -u [user] -p [password] [database] > /backups/backup_$(date +%Y%m%d%H%M%S).sql && cd /backups && ls -t | tail -n +13 | xargs rm -f'
+    depends_on:
+      - mysql
