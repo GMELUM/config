@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# apt install curl -y 
+# curl -O sh.elum.su/mysql.sh 
+# chmod +x mysql.sh 
+#  sh mysql.sh "user" "password" "database"
+
 MYSQL_USER="$1"
 MYSQL_PASSWORD="$2"
 MYSQL_DATABASE="$3"
@@ -18,7 +23,7 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 
-apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
 echo "Create docker-compose script"
 {
@@ -41,7 +46,7 @@ echo "Create docker-compose script"
     echo "    command:"
     echo "      - \"--max_connections=500\""
     echo "      - \"--bind-address=0.0.0.0\""
-} > /root/mysql
+} > /root/mysql/docker-compose.yaml
 
 echo "Start mysql"
 cd /root/mysql
