@@ -37,19 +37,18 @@ echo "Create docker-compose script"
     echo "    image: mysql:latest"
     echo "    restart: always"
     echo "    environment:"
-    echo "      MYSQL_ROOT_PASSWORD: $MYSQL_PASSWORD"
-    echo "      MYSQL_DATABASE: $MYSQL_DATABASE"
-    echo "      MYSQL_USER: $MYSQL_USER"
-    echo "      MYSQL_PASSWORD: $MYSQL_PASSWORD"
+    echo "      MYSQL_ROOT_PASSWORD: \"$MYSQL_PASSWORD\""
+    echo "      MYSQL_DATABASE: \"$MYSQL_DATABASE\""
+    echo "      MYSQL_USER: \"$MYSQL_USER\""
+    echo "      MYSQL_PASSWORD: \"$MYSQL_PASSWORD\""
+    echo "      MYSQL_ROOT_HOST: \"%\""
     echo "    ports:"
     echo "      - "3306:3306""
     echo "    volumes:"
     echo "      - /root/mysql/volume:/var/lib/mysql"
-    echo "    command:"
-    echo "      - \"--max_connections=500\""
-    echo "      - \"--bind-address=0.0.0.0\""
+    echo "      - /root/mysql/my.cnf:/etc/mysql/my.cnf"
 } > /root/mysql/docker-compose.yaml
 
 echo "Start mysql"
 cd /root/mysql
-docker-compose up -d
+docker compose up -d

@@ -14,9 +14,10 @@ services:
       - "3306:3306"
     volumes:
       - /root/mysql:/var/lib/mysql
-    command:
-      - "--max_connections=500"
-      - "--bind-address=0.0.0.0"
+    command: [
+      '--max_connections=500',
+      '--bind-address=0.0.0.0'
+    ]
 
   mysql_backup:
     image: mysql:latest
