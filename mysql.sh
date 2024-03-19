@@ -25,6 +25,8 @@ sudo apt-get update
 
 apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
+mkdir -p /root/mysql/volume
+
 echo "Create docker-compose script"
 {
     echo "version: '3.8'"
