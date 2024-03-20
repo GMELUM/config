@@ -4,26 +4,43 @@ services:
 
   mysql:
     image: mysql:latest
+    container_name: mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: [password]
-      MYSQL_DATABASE: [database]
-      MYSQL_USER: [user]
-      MYSQL_PASSWORD: [password]
+      MYSQL_ROOT_PASSWORD: D07ZhUGYwoyiU6gNt1Mjs8Yw
+      MYSQL_DATABASE: auth
+      MYSQL_USER: user
+      MYSQL_PASSWORD: D07ZhUGYwoyiU6gNt1Mjs8Yw
+      MYSQL_ROOT_HOST: "%"
     ports:
-      - "3306:3306"
+      - 3306:3306
+    expose:
+      - 3306
     volumes:
-      - /root/mysql:/var/lib/mysql
-    command: [
-      '--max_connections=500',
-      '--bind-address=0.0.0.0'
-    ]
+      - /root/mysql/volume:/var/lib/mysql
+    command:
+      [
+        "--bind-address=0.0.0.0",
+        "--max_connections=1000",
+        "--log_bin_trust_function_creators=1"
+      ]
 
-  mysql_backup:
-    image: mysql:latest
-    restart: daily
-    volumes:
-      - /root/backups:/backups
-    command: sh -c 'sleep 3600 && mysqldump -h mysql -u [user] -p [password] [database] > /backups/backup_$(date +%Y%m%d%H%M%S).sql && cd /backups && ls -t | tail -n +13 | xargs rm -f'
-    depends_on:
-      - mysql
+  mysql-master-backup:
+    image: databack/mysql-backup
+    container_name: mysql-backup
+    restart: always
+    environment:
+      SINGLE_DATABASE: true
+      DB_SERVER: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASS: D07ZhUGYwoyiU6gNt1Mjs8Yw
+      DB_NAMES: auth
+      DB_DUMP_FREQ: 60
+      DB_DUMP_TARGET: "s3://29778a8f-fd7a5fa1-c461-4892-85c0-c666ef40b6c3/dumps/auth"
+      AWS_ACCESS_KEY_ID: VTRMLLSEPQPH71BGA5MP
+      AWS_SECRET_ACCESS_KEY: ypbWCufzy9ArapxNo1g4D8qwU9UTG6p1c1rJJJGC
+      AWS_REGION: ru-1
+      AWS_ENDPOINT_URL: https://s3.timeweb.cloud
+      COMPRESSION: bzip2
+    command: dump
