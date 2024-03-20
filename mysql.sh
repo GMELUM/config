@@ -1,10 +1,5 @@
 #!/bin/sh
 
-# apt install curl -y 
-# curl -O sh.elum.su/mysql.sh 
-# chmod +x mysql.sh 
-# sh mysql.sh "user" "password" "database" "endpoint" "region" "secret" "key" "bucket" "interval"
-
 MYSQL_USER="$1"
 MYSQL_PASSWORD="$2"
 MYSQL_DATABASE="$3"
