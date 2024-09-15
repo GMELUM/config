@@ -170,11 +170,18 @@ while true; do
     local_ipv6=$(hostname -I | awk '{print $2}')
 
     found_match=false
-    for dns_ip in $dns_ips; do
-        if [[ "$dns_ip" == "$local_ipv4" || "$dns_ip" == "$local_ipv6" ]]; then
+    for ip in $dns_ips; do
+
+        if [ $ip = $local_ipv4 ]; then
             found_match=true
             break
         fi
+
+        if [ $ip = $local_ipv6 ]; then
+            found_match=true
+            break
+        fi
+
     done
 
     if $found_match; then
