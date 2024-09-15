@@ -164,8 +164,18 @@ systemctl start nginx
 
 echo "Chekout DNS"
 while true; do
-    result=$(dig +short $DOMAIN)
-    current_ip=$(wget -O - -q icanhazip.com)
+    dns_ips=$(dig +short $DOMAIN A)
+
+    local_ipv4=$(hostname -I | awk '{print $1}')
+    local_ipv6=$(hostname -I | awk '{print $2}')
+
+    found_match=false
+    for dns_ip in $dns_ips; do
+        if [[ "$dns_ip" == "$local_ipv4" || "$dns_ip" == "$local_ipv6" ]]; then
+            found_match=true
+            break
+        fi
+    done
 
     match=0
     for ip in $result; do
@@ -175,16 +185,18 @@ while true; do
         fi
     done
 
-    if [ $match = 1 ]; then
+    if $found_match; then
+        echo "Matching IP found: $dns_ip"
         break
+    else
+        echo "IP addresses do not match: $dns_ips"
+        echo "Check again in 10 seconds..."
+        sleep 10
     fi
-
-    echo "The corresponding DNS record could not be found. Checked again in 10 seconds..."
-    sleep 10
 done
 
 echo "Creating ssl certificate with Certbot..."
-certbot certonly --nginx  -n -d $DOMAIN --agree-tos --email $EMAIL
+certbot certonly --nginx -n -d $DOMAIN --agree-tos --email $EMAIL
 
 echo "Update Nginx configuration file..."
 {
