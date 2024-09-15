@@ -177,14 +177,6 @@ while true; do
         fi
     done
 
-    match=0
-    for ip in $result; do
-        if [ $ip = $current_ip ]; then
-            match=1
-            break
-        fi
-    done
-
     if $found_match; then
         echo "Matching IP found: $dns_ip"
         break
