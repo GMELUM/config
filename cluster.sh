@@ -4,7 +4,6 @@ USER_NAME="server"
 USER_HOMEDIR="/home/server"
 USER_SHELL="/bin/bash"
 
-EMAIL="$1"
 DOMAIN="$2"
 USER_SSH_KEY="$1"
 
@@ -57,7 +56,7 @@ echo "Creating Nginx configuration file..."
     echo "    proxy_pass http://127.0.0.1:18300;"
     echo "  }"
     echo "}"
-} >/etc/nginx/sites-enabled/$DOMAIN.conf
+} >/etc/nginx/sites-enabled/default
 
 echo "Restart Nginx..."
 systemctl restart nginx
